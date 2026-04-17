@@ -31,9 +31,23 @@ export default function AdminLayout({ children }) {
 
               <Link
                 className="block rounded-xl px-3 py-2 bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
-                href="/admin/gestion"
+                href="/admin/gestion-alumnos"
               >
-                Gestión
+                Gestión de alumnos
+              </Link>
+
+              <Link
+                className="block rounded-xl px-3 py-2 bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
+                href="/admin/gestion-padres"
+              >
+                Gestión de padres
+              </Link>
+
+              <Link
+                className="block rounded-xl px-3 py-2 bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
+                href="/admin/gestion-admins"
+              >
+                Gestión de administradores
               </Link>
             </div>
 
@@ -77,9 +91,6 @@ export default function AdminLayout({ children }) {
 
             {children}
 
-            <footer className="mt-10 text-sm text-white/50">
-              © {new Date().getFullYear()} ANDEA · Admin Fundación
-            </footer>
           </section>
 
         </div>

@@ -16,7 +16,6 @@ export default function AdminLoginPage() {
     <main className="min-h-screen section-purple text-white px-6 py-16">
       <div className="mx-auto max-w-4xl">
         
-        {/* Header */}
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="glass h-10 w-10 rounded-full grid place-items-center">
@@ -30,10 +29,8 @@ export default function AdminLoginPage() {
           </Link>
         </div>
 
-        {/* Contenido */}
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
 
-          {/* Info */}
           <div className="card-glass p-8">
             <p className="text-xs uppercase tracking-widest text-white/70">
               Fundación · Administradores
@@ -79,13 +76,7 @@ export default function AdminLoginPage() {
 
             </form>
           </div>
-
         </div>
-
-        {/* Footer */}
-        <footer className="mt-16 text-sm text-white/50">
-          © {new Date().getFullYear()} ANDEA · Fundación
-        </footer>
 
       </div>
     </main>
