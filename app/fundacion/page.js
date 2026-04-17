@@ -8,7 +8,6 @@ export default function FundacionLoginPage() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    // Demo: acepta cualquier texto
     router.push("/admin/dashboard");
   }
 
@@ -16,7 +15,6 @@ export default function FundacionLoginPage() {
     <main className="min-h-screen section-purple text-white px-6 py-16">
       <div className="mx-auto max-w-4xl">
         
-        {/* HEADER */}
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="glass h-10 w-10 rounded-full grid place-items-center">
@@ -30,10 +28,8 @@ export default function FundacionLoginPage() {
           </Link>
         </div>
 
-        {/* CONTENIDO */}
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           
-          {/* INFO */}
           <div className="card-glass p-8">
             <p className="text-xs uppercase tracking-widest text-white/70">
               Fundación · Administradores
@@ -55,7 +51,6 @@ export default function FundacionLoginPage() {
             </div>
           </div>
 
-          {/* FORM */}
           <div className="card-glass p-8">
             <h2 className="text-xl font-semibold">Iniciar sesión</h2>
 
@@ -86,12 +81,6 @@ export default function FundacionLoginPage() {
             </form>
           </div>
         </div>
-
-        {/* FOOTER */}
-        <footer className="mt-16 text-sm text-white/50">
-          © {new Date().getFullYear()} ANDEA · Fundación
-        </footer>
-
       </div>
     </main>
   );
