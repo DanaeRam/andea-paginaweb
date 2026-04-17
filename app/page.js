@@ -57,9 +57,14 @@ export default function HomePage() {
               </Link>
             </nav>
 
-            <Link href="/jugar" className="btn-pill btn-glass">
-              Jugar
-            </Link>
+              <a
+                href="https://danaeram.github.io/AndeaWeb3/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-pill btn-glass"
+              >
+                Jugar
+              </a>
           </div>
         </header>
 
@@ -83,9 +88,14 @@ export default function HomePage() {
             </p>
 
             <div className="mt-7 flex items-center gap-4">
-              <Link href="/jugar" className="btn-pill btn-primary">
+              <a
+                href="https://danaeram.github.io/AndeaWeb3/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-pill btn-primary"
+              >
                 Jugar
-              </Link>
+              </a>
 
               <a href="#problematica" className="text-sm text-white/85 hover:text-white">
                 Ver cómo ayuda ↓
