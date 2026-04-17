@@ -4,15 +4,15 @@ import Link from "next/link";
 const problems = [
   {
     title: "Lecto-escritura",
-    desc: "Ejercicios simples y visuales para aprender a leer y escribir.",
+    desc: "Aprender a leer y escribir de forma divertida.",
   },
   {
     title: "Matemáticas",
-    desc: "Actividades básicas para practicar números de forma divertida.",
+    desc: "Practicar números con juegos.",
   },
   {
     title: "Salud Mental",
-    desc: "Ejercicios para reconocer emociones y fortalecer confianza.",
+    desc: "Reconocer emociones y fortalecer confianza.",
   },
 ];
 
@@ -20,41 +20,39 @@ export default function Home() {
   return (
     <main>
 
-      <section style={{ position: "relative", height: "100vh" }}>
+      <section className="hero">
         <Image
           src="/andea-inicio.png"
-          alt="Fondo ANDEA"
+          alt="Fondo"
           fill
           style={{ objectFit: "cover" }}
         />
 
-        <header style={{ position: "relative", padding: "20px", display: "flex", justifyContent: "space-between" }}>
+        <header className="navbar">
           <Link href="/">ANDEA</Link>
 
           <nav>
-            <Link href="/">Inicio </Link>
-            <Link href="/portal-familiar">Portal </Link>
-            <Link href="/fundacion">Fundación </Link>
+            <Link href="/">Inicio</Link>
+            <Link href="/portal-familiar">Portal</Link>
+            <Link href="/fundacion">Fundación</Link>
             <Link href="/jugar">Jugar</Link>
           </nav>
         </header>
 
-        <div style={{ position: "relative", padding: "40px" }}>
+        <div className="hero-content">
           <h1>ANDEA</h1>
-          <p>
-            Aprende lecto-escritura, matemáticas y salud mental jugando.
-          </p>
+          <p>Aprende jugando</p>
 
           <Link href="/jugar">Jugar</Link>
         </div>
       </section>
 
-      <section style={{ padding: "40px" }}>
+      <section className="section">
         <h2>¿Qué problema resolvemos?</h2>
 
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
+        <div className="problems">
           {problems.map((p) => (
-            <div key={p.title}>
+            <div key={p.title} className="card">
               <h3>{p.title}</h3>
               <p>{p.desc}</p>
             </div>
@@ -62,12 +60,12 @@ export default function Home() {
         </div>
       </section>
 
-      <section style={{ padding: "40px" }}>
+      <section className="section">
         <h3>Portal Familiar</h3>
-        <p>Ver progreso y actividades del usuario.</p>
+        <p>Seguimiento del progreso del usuario.</p>
 
         <h3>Fundación</h3>
-        <p>Gestión de estudiantes y reportes.</p>
+        <p>Gestión de estudiantes.</p>
       </section>
 
     </main>
