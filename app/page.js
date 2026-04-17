@@ -1,83 +1,146 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+const problems = [
+  {
+    title: "Lecto-escritura",
+    desc: "Practica lecto-escritura con ejercicios cortos, guiados y visuales.",
+  },
+  {
+    title: "Matemáticas",
+    desc: "Practica matemáticas con ejercicios cortos, guiados y visuales.",
+  },
+  {
+    title: "Salud Mental",
+    desc: "Incluye actividades simples para reconocer emociones, fortalecer confianza y bienestar.",
+  },
+];
+
+export default function HomePage() {
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      <Image
-        src="/andea-inicio.png"
-        alt="Fondo principal de ANDEA"
-        fill
-        priority
-        className="object-cover"
-      />
+    <main className="min-h-screen text-white">
+      <section className="relative min-h-screen overflow-hidden">
+        <Image
+          src="/andea-inicio.png"
+          alt="Fondo del videojuego ANDEA"
+          fill
+          priority
+          className="object-cover"
+        />
 
-      <div className="mainimage-overlay absolute inset-0 z-10" />
+        <div className="mainimage-overlay absolute inset-0" />
 
-      <section className="relative z-20 flex min-h-screen flex-col">
-        <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-7 md:px-10">
-          <div className="flex items-center gap-3">
-            <div className="glass flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold">
-              A
+        <header className="relative z-10 mx-auto flex max-w-6xl items-center px-6 py-6">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="glass grid h-10 w-10 place-items-center rounded-full">
+              <span className="text-sm font-semibold">A</span>
             </div>
-            <span className="text-lg font-bold tracking-wide">ANDEA</span>
-          </div>
-
-          <nav className="hidden items-center gap-10 md:flex">
-            <Link href="/" className="font-semibold text-white/95 transition hover:text-white">
-              Inicio
-            </Link>
-            <Link
-              href="/portal-familiar"
-              className="font-semibold text-white/95 transition hover:text-white"
-            >
-              Portal Familiar
-            </Link>
-            <Link
-              href="/fundacion"
-              className="font-semibold text-white/95 transition hover:text-white"
-            >
-              Fundación
-            </Link>
-          </nav>
-
-          <Link href="/jugar" className="btn-pill btn-glass">
-            Jugar
+            <span className="font-semibold tracking-wide">ANDEA</span>
           </Link>
+
+          <div className="ml-auto flex items-center gap-8">
+            <nav className="hidden items-center gap-8 md:flex">
+              <Link className="text-sm font-semibold text-white/90 hover:text-white" href="#inicio">
+                Inicio
+              </Link>
+              <Link
+                className="text-sm font-semibold text-white/90 hover:text-white"
+                href="/portal-familiar"
+              >
+                Portal Familiar
+              </Link>
+              <Link
+                className="text-sm font-semibold text-white/90 hover:text-white"
+                href="/fundacion"
+              >
+                Fundación
+              </Link>
+            </nav>
+
+            <Link href="/jugar" className="btn-pill btn-glass">
+              Jugar
+            </Link>
+          </div>
         </header>
 
-        <div className="mx-auto flex w-full max-w-7xl flex-1 items-center px-6 pb-16 pt-6 md:px-10">
+        <div
+          id="inicio"
+          className="relative z-10 mx-auto flex max-w-6xl px-6 pb-20 pt-16 md:pt-24"
+        >
           <div className="max-w-xl">
-            <h1 className="text-mainimage-title text-6xl font-extrabold tracking-tight md:text-7xl">
+            <h1 className="text-mainimage-title text-4xl font-semibold leading-tight md:text-6xl">
               ANDEA
             </h1>
 
-            <div className="mainimage-divider my-8" />
+            <div className="mainimage-divider mt-5" />
 
-            <p className="text-mainimage-paragraph text-lg font-medium md:text-xl">
-              Imagina un mundo donde aprender es tan emocionante como pasar de nivel
-              en tu juego favorito. <strong>ANDEA</strong> convierte la lecto-escritura,
-              las matemáticas básicas y el cuidado de la salud mental en retos con
-              aventuras, mini-misiones y recompensas.
+            <p className="text-mainimage-paragraph mt-5 leading-relaxed">
+              Imagina un mundo donde aprender es tan emocionante como pasar de nivel en
+              tu juego favorito.
+              <span className="font-semibold text-white"> ANDEA </span>
+              convierte la lecto-escritura, las matemáticas básicas y el cuidado de la
+              salud mental en retos con aventuras, mini-misiones y recompensas.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-5">
+            <div className="mt-7 flex items-center gap-4">
               <Link href="/jugar" className="btn-pill btn-primary">
                 Jugar
               </Link>
 
-              <a
-                href="#problematica"
-                className="text-base font-semibold text-white/85 transition hover:text-white"
-              >
+              <a href="#problematica" className="text-sm text-white/85 hover:text-white">
                 Ver cómo ayuda ↓
               </a>
             </div>
           </div>
         </div>
 
-        <div className="pointer-events-none pb-6 text-center text-sm font-medium text-white/70">
+        <div className="pointer-events-none absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-xs text-white/70">
           Desliza para ver más
+        </div>
+      </section>
+
+      <section id="problematica" className="section-purple px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
+            <p className="text-xs uppercase tracking-widest text-white/70">
+              ¿Qué problema resuelve?
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold md:text-4xl">
+              3 problemáticas que atacamos con el videojuego
+            </h2>
+            <p className="mt-4 text-white/80">
+              ANDEA está pensado para niños y familias: simple, visual y con retos
+              cortos para mantener atención, motivación y aprendizaje constante.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {problems.map((p) => (
+              <div key={p.title} className="card-glass p-6">
+                <div className="glass mb-3 h-10 w-10 rounded-xl" />
+                <h3 className="text-lg font-semibold">{p.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/75">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 grid gap-10 md:grid-cols-2">
+            <div id="portal" className="card-glass p-6">
+              <h3 className="text-xl font-semibold">Portal Familiar</h3>
+              <p className="mt-2 text-white/75">
+                Un espacio para que la familia vea avances, misiones completadas y
+                recomendaciones de práctica.
+              </p>
+            </div>
+
+            <div id="fundacion" className="card-glass p-6">
+              <h3 className="text-xl font-semibold">Fundación</h3>
+              <p className="mt-2 text-white/75">
+                Portal exclusivo para miembros de la fundación. Aquí se gestionan
+                estudiantes, códigos y reportes.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </main>
