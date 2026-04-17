@@ -1,26 +1,194 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-deep: #0b1235;
+  --blue-dark: #0f1b4c;
+  --blue-navy: #1a2c7a;
+
+  --purple-soft: #7b5cff;
+  --purple-light: #a875ff;
+
+  --text-soft: rgba(255, 255, 255, 0.82);
+  --text-muted: rgba(255, 255, 255, 0.68);
+
+  --glass: rgba(255, 255, 255, 0.16);
+  --stroke: rgba(255, 255, 255, 0.24);
+
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
+  --shadow-strong: 0 16px 40px rgba(0, 0, 0, 0.32);
+
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  --transition-fast: 180ms ease;
+  --transition-medium: 280ms ease;
+
+  --gradient-main: linear-gradient(
+    135deg,
+    #6ec7ff 0%,
+    #5aa8ff 35%,
+    #9b6cff 70%,
+    #c38fff 100%
+  );
+
+  --gradient-section: linear-gradient(
+    135deg,
+    #0f1b4c 0%,
+    #1a2c7a 35%,
+    #7b5cff 70%,
+    #a875ff 100%
+  );
+
+  --gradient-button: linear-gradient(
+    135deg,
+    #1a2c7a 0%,
+    #3f4bd9 50%,
+    #7b5cff 100%
+  );
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* =========================
+   BASE
+========================= */
+html,
+body {
+  height: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-deep);
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mainimage-overlay {
+  background:
+    radial-gradient(80% 70% at 70% 10%, rgba(255, 255, 255, 0.06), transparent 60%),
+    radial-gradient(70% 70% at 20% 20%, rgba(167, 139, 250, 0.12), transparent 60%),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.38) 50%,
+      rgba(0, 0, 0, 0.14) 100%
+    );
+}
+
+.text-mainimage-title {
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+}
+
+.text-mainimage-paragraph {
+  color: var(--text-soft);
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  line-height: 1.65;
+}
+
+.mainimage-divider {
+  width: 220px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 0;
+}
+
+/* =========================
+   GLASSMORPHISM
+========================= */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--stroke);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+
+  transition:
+    transform var(--transition-fast),
+    opacity var(--transition-fast),
+    box-shadow var(--transition-medium),
+    background var(--transition-medium);
+}
+
+.btn-pill:hover {
+  transform: translateY(-1px);
+}
+
+.btn-pill:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: var(--gradient-button);
+  color: white;
+  box-shadow: 0 10px 25px rgba(30, 40, 120, 0.35);
+}
+
+.btn-primary:hover {
+  opacity: 0.96;
+  box-shadow: 0 14px 30px rgba(30, 40, 120, 0.42);
+}
+
+.btn-glass {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: white;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.section-purple {
+  background: var(--gradient-section);
+}
+
+
+.card-glass {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.05)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-soft);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-medium),
+    border-color var(--transition-medium);
+}
+
+.card-glass:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-strong);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+
+.text-soft {
+  color: var(--text-soft);
+}
+
+.text-muted {
+  color: var(--text-muted);
 }

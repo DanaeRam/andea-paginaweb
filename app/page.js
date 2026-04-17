@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <main>
 
-      <section className="hero">
+      <section className="mainimage">
         <Image
           src="/andea-inicio.png"
           alt="Fondo"
@@ -39,7 +39,7 @@ export default function Home() {
           </nav>
         </header>
 
-        <div className="hero-content">
+        <div className="mainimage-content">
           <h1>ANDEA</h1>
           <p>Aprende jugando</p>
 
