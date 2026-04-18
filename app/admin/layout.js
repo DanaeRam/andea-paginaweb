@@ -79,7 +79,7 @@ export default function AdminLayout({ children }) {
               </Link>
 
               <div className="flex gap-2">
-                <Link href="/admin/gestion" className="btn-pill btn-glass">
+                <Link href="/admin/gestion-alumnos" className="btn-pill btn-glass">
                   Gestión
                 </Link>
 

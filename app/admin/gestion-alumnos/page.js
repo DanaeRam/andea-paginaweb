@@ -13,12 +13,59 @@ function fakeCode(prefix) {
 export default function AdminGestionPage() {
   const [activeForm, setActiveForm] = useState(null);
 
+  const [nombre, setNombre] = useState("");
+  const [edad, setEdad] = useState("");
+
   const [gameCode, setGameCode] = useState("");
   const [famCode, setFamCode] = useState("");
 
-  function handleGenerateCodes() {
-    setGameCode(fakeCode("GAME"));
-    setFamCode(fakeCode("FAM"));
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  async function handleCreateStudent() {
+    setMessage("");
+
+    if (!nombre.trim() || !edad.trim()) {
+      setMessage("Completa nombre y edad.");
+      return;
+    }
+
+    const nuevoGameCode = fakeCode("GAME");
+    const nuevoFamCode = fakeCode("FAM");
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/jugador/crear", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: nombre.trim(),
+          edad: Number(edad),
+          codigo: nuevoGameCode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.error || "No se pudo guardar el jugador.");
+        return;
+      }
+
+      setGameCode(nuevoGameCode);
+      setFamCode(nuevoFamCode);
+      setMessage("Jugador creado correctamente.");
+
+      setNombre("");
+      setEdad("");
+    } catch (error) {
+      setMessage("Error de conexión con el servidor.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -55,21 +102,31 @@ export default function AdminGestionPage() {
           {activeForm === "alta" && (
             <div className="mt-6 space-y-4">
               <input
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
                 placeholder="Nombre"
                 className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
               />
 
               <input
+                value={edad}
+                onChange={(e) => setEdad(e.target.value)}
                 placeholder="Edad"
+                type="number"
                 className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
               />
 
               <button
-                onClick={handleGenerateCodes}
+                onClick={handleCreateStudent}
+                disabled={loading}
                 className="btn-pill btn-primary w-full"
               >
-                Generar código
+                {loading ? "Guardando..." : "Generar código"}
               </button>
+
+              {message && (
+                <div className="text-sm text-white/80">{message}</div>
+              )}
 
               {gameCode && (
                 <div className="mt-3 text-sm text-white/80">
