@@ -62,7 +62,7 @@ export default function PortalFamiliarPage() {
   </div>
 </header>
 
-      <div className="mx-auto max-w-6xl px-6 pt-28 pb-16">
+      <div className="mx-auto max-w-6xl px-6 pt-8 pb-16">
         <div className="max-w-3xl">
           <p className="text-xs uppercase tracking-widest text-white/70">
             Portal Familiar
