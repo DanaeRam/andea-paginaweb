@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function fakeCode(prefix) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -10,11 +10,49 @@ function fakeCode(prefix) {
   return `${prefix}-${part}`;
 }
 
+function calculateAge(fechaNacimiento) {
+  if (!fechaNacimiento) return "";
+
+  const today = new Date();
+  const birthDate = new Date(fechaNacimiento);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
+function formatDateForInput(day, month, year) {
+  if (!day || !month || !year) return "";
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
+function formatDisplayDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("es-MX", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 export default function AdminGestionPage() {
   const [activeForm, setActiveForm] = useState(null);
 
-  const [nombre, setNombre] = useState("");
-  const [edad, setEdad] = useState("");
+  const [nombreCompleto, setNombreCompleto] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState("");
+  const [dia, setDia] = useState("");
+  const [mes, setMes] = useState("");
+  const [anio, setAnio] = useState("");
 
   const [gameCode, setGameCode] = useState("");
   const [famCode, setFamCode] = useState("");
@@ -27,15 +65,62 @@ export default function AdminGestionPage() {
   const [loadingHistorial, setLoadingHistorial] = useState(false);
   const [historialError, setHistorialError] = useState("");
 
-  async function handleCreateStudent() {
-    setMessage("");
+  function handleCalendarChange(value) {
+    setFechaNacimiento(value);
 
-    if (!nombre.trim() || !edad.trim()) {
-      setMessage("Completa nombre y edad.");
+    if (!value) {
+      setDia("");
+      setMes("");
+      setAnio("");
       return;
     }
 
-    const nuevoGameCode = fakeCode("GAME");
+    const [year, month, day] = value.split("-");
+    setDia(day || "");
+    setMes(month || "");
+    setAnio(year || "");
+  }
+
+  function handleManualDateChange(type, value) {
+    const onlyNumbers = value.replace(/\D/g, "");
+
+    if (type === "dia") setDia(onlyNumbers.slice(0, 2));
+    if (type === "mes") setMes(onlyNumbers.slice(0, 2));
+    if (type === "anio") setAnio(onlyNumbers.slice(0, 4));
+
+    const newDay = type === "dia" ? onlyNumbers.slice(0, 2) : dia;
+    const newMonth = type === "mes" ? onlyNumbers.slice(0, 2) : mes;
+    const newYear = type === "anio" ? onlyNumbers.slice(0, 4) : anio;
+
+    if (newDay.length >= 1 && newMonth.length >= 1 && newYear.length === 4) {
+      const formatted = formatDateForInput(newDay, newMonth, newYear);
+      const testDate = new Date(formatted);
+
+      if (!isNaN(testDate.getTime())) {
+        setFechaNacimiento(formatted);
+      }
+    }
+  }
+
+  async function handleCreateStudent() {
+    setMessage("");
+
+    const finalFechaNacimiento =
+      fechaNacimiento || formatDateForInput(dia, mes, anio);
+
+    if (!nombreCompleto.trim() || !finalFechaNacimiento) {
+      setMessage("Completa el nombre completo y la fecha de nacimiento.");
+      return;
+    }
+
+    const edadCalculada = calculateAge(finalFechaNacimiento);
+
+    if (edadCalculada < 0 || edadCalculada > 120) {
+      setMessage("La fecha de nacimiento no es válida.");
+      return;
+    }
+
+    const nuevoGameCode = fakeCode("JUG");
     const nuevoFamCode = fakeCode("FAM");
 
     setLoading(true);
@@ -47,9 +132,10 @@ export default function AdminGestionPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          nombre: nombre.trim(),
-          edad: Number(edad),
-          codigo: nuevoGameCode,
+          nombreCompleto: nombreCompleto.trim(),
+          fechaNacimiento: finalFechaNacimiento,
+          codigoJugador: nuevoGameCode,
+          codigoFamiliar: nuevoFamCode,
         }),
       });
 
@@ -64,8 +150,11 @@ export default function AdminGestionPage() {
       setFamCode(nuevoFamCode);
       setMessage("Jugador creado correctamente.");
 
-      setNombre("");
-      setEdad("");
+      setNombreCompleto("");
+      setFechaNacimiento("");
+      setDia("");
+      setMes("");
+      setAnio("");
 
       if (activeForm === "historial") {
         fetchHistorial();
@@ -116,9 +205,7 @@ export default function AdminGestionPage() {
   return (
     <div className="space-y-6">
       <div className="card-glass p-6">
-        <h1 className="text-2xl font-semibold">
-          Gestión de estudiantes
-        </h1>
+        <h1 className="text-2xl font-semibold">Gestión de alumnos</h1>
         <p className="mt-2 text-white/70">
           Gestiona altas y bajas de alumnos
         </p>
@@ -145,26 +232,61 @@ export default function AdminGestionPage() {
           {activeForm === "alta" && (
             <div className="mt-6 space-y-4">
               <input
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Nombre"
+                value={nombreCompleto}
+                onChange={(e) => setNombreCompleto(e.target.value)}
+                placeholder="Nombre completo"
                 className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
               />
 
-              <input
-                value={edad}
-                onChange={(e) => setEdad(e.target.value)}
-                placeholder="Edad"
-                type="number"
-                className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
-              />
+              <div className="space-y-3">
+                <label className="block text-sm text-white/80">
+                  Fecha de nacimiento
+                </label>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <input
+                    value={dia}
+                    onChange={(e) =>
+                      handleManualDateChange("dia", e.target.value)
+                    }
+                    placeholder="Día"
+                    inputMode="numeric"
+                    className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
+                  />
+                  <input
+                    value={mes}
+                    onChange={(e) =>
+                      handleManualDateChange("mes", e.target.value)
+                    }
+                    placeholder="Mes"
+                    inputMode="numeric"
+                    className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
+                  />
+                  <input
+                    value={anio}
+                    onChange={(e) =>
+                      handleManualDateChange("anio", e.target.value)
+                    }
+                    placeholder="Año"
+                    inputMode="numeric"
+                    className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
+                  />
+                </div>
+
+                <input
+                  type="date"
+                  value={fechaNacimiento}
+                  onChange={(e) => handleCalendarChange(e.target.value)}
+                  className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
+                />
+              </div>
 
               <button
                 onClick={handleCreateStudent}
                 disabled={loading}
                 className="btn-pill btn-primary w-full"
               >
-                {loading ? "Guardando..." : "Generar código"}
+                {loading ? "Guardando..." : "Generar códigos"}
               </button>
 
               {message && (
@@ -174,31 +296,31 @@ export default function AdminGestionPage() {
               {gameCode && (
                 <div className="mt-3 flex items-center justify-between text-sm text-white/80">
                   <div>
-                    Código niño: <span className="font-mono">{gameCode}</span>
+                    Código jugador: <span className="font-mono">{gameCode}</span>
                   </div>
 
-<button
-  onClick={() => copyToClipboard(gameCode)}
-  className="ml-2 opacity-70 hover:opacity-100 transition"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <rect x="9" y="9" width="10" height="10" rx="2" />
-    <rect x="5" y="5" width="10" height="10" rx="2" />
-  </svg>
-</button>
+                  <button
+                    onClick={() => copyToClipboard(gameCode, "game")}
+                    className="ml-2 opacity-70 transition hover:opacity-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="h-5 w-5"
+                    >
+                      <rect x="9" y="9" width="10" height="10" rx="2" />
+                      <rect x="5" y="5" width="10" height="10" rx="2" />
+                    </svg>
+                  </button>
                 </div>
               )}
 
               {copied === "game" && (
                 <div className="text-xs text-green-300">
-                  Código niño copiado
+                  Código de jugador copiado
                 </div>
               )}
 
@@ -208,22 +330,22 @@ export default function AdminGestionPage() {
                     Código familiar: <span className="font-mono">{famCode}</span>
                   </div>
 
-<button
-  onClick={() => copyToClipboard(gameCode)}
-  className="ml-2 opacity-70 hover:opacity-100 transition"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <rect x="9" y="9" width="10" height="10" rx="2" />
-    <rect x="5" y="5" width="10" height="10" rx="2" />
-  </svg>
-</button>
+                  <button
+                    onClick={() => copyToClipboard(famCode, "fam")}
+                    className="ml-2 opacity-70 transition hover:opacity-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="h-5 w-5"
+                    >
+                      <rect x="9" y="9" width="10" height="10" rx="2" />
+                      <rect x="5" y="5" width="10" height="10" rx="2" />
+                    </svg>
+                  </button>
                 </div>
               )}
 
@@ -296,12 +418,12 @@ export default function AdminGestionPage() {
             )}
 
             {!loadingHistorial && !historialError && (
-              <div className="overflow-hidden rounded-xl ring-1 ring-white/10">
+              <div className="overflow-x-auto rounded-xl ring-1 ring-white/10">
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/80">
                     <tr>
                       <th className="px-4 py-3 text-left font-semibold">
-                        Nombre jugador
+                        Nombre completo
                       </th>
                       <th className="px-4 py-3 text-left font-semibold">
                         Edad
@@ -312,6 +434,9 @@ export default function AdminGestionPage() {
                       <th className="px-4 py-3 text-left font-semibold">
                         Código familiar
                       </th>
+                      <th className="px-4 py-3 text-left font-semibold">
+                        Fecha de creación
+                      </th>
                     </tr>
                   </thead>
 
@@ -319,7 +444,7 @@ export default function AdminGestionPage() {
                     {historial.length === 0 ? (
                       <tr>
                         <td
-                          colSpan="4"
+                          colSpan="5"
                           className="px-4 py-4 text-center text-white/60"
                         >
                           No hay jugadores registrados.
@@ -328,14 +453,21 @@ export default function AdminGestionPage() {
                     ) : (
                       historial.map((jugador) => (
                         <tr key={jugador.id}>
-                          <td className="px-4 py-3">{jugador.nombre}</td>
+                          <td className="px-4 py-3">
+                            {jugador.nombreCompleto}
+                          </td>
                           <td className="px-4 py-3 text-white/75">
-                            {jugador.edad}
+                            {calculateAge(jugador.fechaNacimiento)}
                           </td>
                           <td className="px-4 py-3 font-mono text-white/75">
-                            {jugador.codigo}
+                            {jugador.codigoJugador}
                           </td>
-                          <td className="px-4 py-3 text-white/50"></td>
+                          <td className="px-4 py-3 font-mono text-white/75">
+                            {jugador.codigoFamiliar}
+                          </td>
+                          <td className="px-4 py-3 text-white/75">
+                            {formatDisplayDate(jugador.createdAt)}
+                          </td>
                         </tr>
                       ))
                     )}

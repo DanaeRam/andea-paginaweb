@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabase";
+
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from("jugador")
-      .select("*")
+      .select(`
+        id,
+        nombreCompleto,
+        fechaNacimiento,
+        codigoJugador,
+        codigoFamiliar,
+        createdAt,
+        edad:EXTRACT(YEAR FROM AGE(current_date, fechaNacimiento))
+      `)
       .order("id", { ascending: false });
 
     if (error) {
@@ -18,6 +27,7 @@ export async function GET() {
       ok: true,
       jugadores: data,
     });
+
   } catch (error) {
     return NextResponse.json(
       { error: "Error interno del servidor" },

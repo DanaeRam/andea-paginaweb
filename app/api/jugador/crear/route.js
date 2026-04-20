@@ -14,7 +14,7 @@ export async function POST(req) {
 
     const { data, error } = await supabaseAdmin
       .from("jugador")
-      .insert([{ nombre, edad, codigo }])
+      .insert([{ nombreCompleto, fechaNacimiento, codigoJugador, codigoFamiliar }])
       .select()
       .single();
 
