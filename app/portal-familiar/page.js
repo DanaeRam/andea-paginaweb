@@ -2,65 +2,177 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function PortalFamiliarPage() {
   const router = useRouter();
 
-  function handleRegister(e) {
-    e.preventDefault();
-    router.push("/portal-familiar/registro-exitoso");
+  const [nombreCompleto, setNombreCompleto] = useState("");
+  const [emailRegistro, setEmailRegistro] = useState("");
+  const [passwordRegistro, setPasswordRegistro] = useState("");
+  const [codigoFamiliar, setCodigoFamiliar] = useState("");
+
+  const [emailLogin, setEmailLogin] = useState("");
+  const [passwordLogin, setPasswordLogin] = useState("");
+
+  const [loadingRegister, setLoadingRegister] = useState(false);
+  const [loadingLogin, setLoadingLogin] = useState(false);
+
+  const [registerMessage, setRegisterMessage] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  function handleLogin(e) {
+  async function handleRegister(e) {
     e.preventDefault();
-    router.push("/portal-familiar/acceso-padres");
+    setRegisterMessage("");
+
+    const nombreLimpio = nombreCompleto.trim();
+    const emailLimpio = emailRegistro.trim().toLowerCase();
+    const passwordLimpio = passwordRegistro.trim();
+    const codigoLimpio = codigoFamiliar.trim().toUpperCase();
+
+    if (!nombreLimpio || !emailLimpio || !passwordLimpio || !codigoLimpio) {
+      setRegisterMessage("Completa todos los campos.");
+      return;
+    }
+
+    if (!isValidEmail(emailLimpio)) {
+      setRegisterMessage("Ingresa un correo válido.");
+      return;
+    }
+
+    if (passwordLimpio.length < 6) {
+      setRegisterMessage("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+
+    if (!codigoLimpio.startsWith("FAM-")) {
+      setRegisterMessage("El código familiar debe iniciar con FAM-.");
+      return;
+    }
+
+    setLoadingRegister(true);
+
+    try {
+      const response = await fetch("/api/padre/registro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombreCompleto: nombreLimpio,
+          email: emailLimpio,
+          password: passwordLimpio,
+          codigoFamiliar: codigoLimpio,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRegisterMessage(data.error || "No se pudo crear la cuenta.");
+        return;
+      }
+
+      setNombreCompleto("");
+      setEmailRegistro("");
+      setPasswordRegistro("");
+      setCodigoFamiliar("");
+
+      router.push("/portal-familiar/registro-exitoso");
+    } catch (error) {
+      setRegisterMessage("Error de conexión con el servidor.");
+    } finally {
+      setLoadingRegister(false);
+    }
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    setLoginMessage("");
+
+    const emailLimpio = emailLogin.trim().toLowerCase();
+    const passwordLimpio = passwordLogin.trim();
+
+    if (!emailLimpio || !passwordLimpio) {
+      setLoginMessage("Completa correo y contraseña.");
+      return;
+    }
+
+    if (!isValidEmail(emailLimpio)) {
+      setLoginMessage("Ingresa un correo válido.");
+      return;
+    }
+
+    setLoadingLogin(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: emailLimpio,
+        password: passwordLimpio,
+      });
+
+      if (error) {
+        setLoginMessage("Correo o contraseña incorrectos.");
+        return;
+      }
+
+      router.push("/portal-familiar/acceso-padres");
+    } catch (error) {
+      setLoginMessage("Error al iniciar sesión.");
+    } finally {
+      setLoadingLogin(false);
+    }
   }
 
   return (
     <main className="min-h-screen section-purple text-white">
-<header className="relative z-10 mx-auto flex max-w-6xl items-center px-6 py-6">
-  {/* Logo */}
-  <Link href="/" className="flex items-center gap-2">
-    <div className="glass grid h-10 w-10 place-items-center rounded-full">
-      <span className="text-sm font-semibold">A</span>
-    </div>
-    <span className="font-semibold tracking-wide">ANDEA</span>
-  </Link>
+      <header className="relative z-10 mx-auto flex max-w-6xl items-center px-6 py-6">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="glass grid h-10 w-10 place-items-center rounded-full">
+            <span className="text-sm font-semibold">A</span>
+          </div>
+          <span className="font-semibold tracking-wide">ANDEA</span>
+        </Link>
 
-  <div className="ml-auto flex items-center gap-8">
-    <nav className="hidden items-center gap-8 md:flex">
-      <Link
-        className="text-sm font-semibold text-white/90 hover:text-white"
-        href="/"
-      >
-        Inicio
-      </Link>
+        <div className="ml-auto flex items-center gap-8">
+          <nav className="hidden items-center gap-8 md:flex">
+            <Link
+              className="text-sm font-semibold text-white/90 hover:text-white"
+              href="/"
+            >
+              Inicio
+            </Link>
 
-      <Link
-        className="text-sm font-semibold text-white/90 hover:text-white"
-        href="/portal-familiar"
-      >
-        Portal Familiar
-      </Link>
+            <Link
+              className="text-sm font-semibold text-white/90 hover:text-white"
+              href="/portal-familiar"
+            >
+              Portal Familiar
+            </Link>
 
-      <Link
-        className="text-sm font-semibold text-white/90 hover:text-white"
-        href="/fundacion"
-      >
-        Fundación
-      </Link>
-    </nav>
+            <Link
+              className="text-sm font-semibold text-white/90 hover:text-white"
+              href="/fundacion"
+            >
+              Fundación
+            </Link>
+          </nav>
 
-    <a
-      href="https://danaeram.github.io/AndeaWeb3/"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="btn-pill btn-glass"
-    >
-      Jugar
-    </a>
-  </div>
-</header>
+          <a
+            href="https://danaeram.github.io/AndeaWeb3/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-pill btn-glass"
+          >
+            Jugar
+          </a>
+        </div>
+      </header>
 
       <div className="mx-auto max-w-6xl px-6 pt-8 pb-16">
         <div className="max-w-3xl">
@@ -101,9 +213,24 @@ export default function PortalFamiliarPage() {
 
             <form onSubmit={handleRegister} className="mt-6 space-y-4">
               <div>
-                <label className="text-sm text-white/80">Email</label>
+                <label className="text-sm text-white/80">
+                  Nombre completo del padre o tutor
+                </label>
                 <input
                   type="text"
+                  value={nombreCompleto}
+                  onChange={(e) => setNombreCompleto(e.target.value)}
+                  placeholder="Nombre completo"
+                  className="mt-2 w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none focus:ring-white/25"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-white/80">Email</label>
+                <input
+                  type="email"
+                  value={emailRegistro}
+                  onChange={(e) => setEmailRegistro(e.target.value)}
                   placeholder="tutor@email.com"
                   className="mt-2 w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none focus:ring-white/25"
                 />
@@ -113,29 +240,35 @@ export default function PortalFamiliarPage() {
                 <label className="text-sm text-white/80">Contraseña</label>
                 <input
                   type="password"
+                  value={passwordRegistro}
+                  onChange={(e) => setPasswordRegistro(e.target.value)}
                   placeholder="••••••••"
                   className="mt-2 w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none focus:ring-white/25"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-white/80">
-                  Código Familiar
-                </label>
+                <label className="text-sm text-white/80">Código Familiar</label>
                 <input
                   type="text"
+                  value={codigoFamiliar}
+                  onChange={(e) => setCodigoFamiliar(e.target.value.toUpperCase())}
                   placeholder="FAM-48K2"
                   className="mt-2 w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none focus:ring-white/25"
                 />
               </div>
 
-              <button type="submit" className="btn-pill btn-primary w-full">
-                Crear cuenta y vincular
+              <button
+                type="submit"
+                disabled={loadingRegister}
+                className="btn-pill btn-primary w-full"
+              >
+                {loadingRegister ? "Creando cuenta..." : "Crear cuenta y vincular"}
               </button>
 
-              <p className="text-xs text-white/55">
-                Por ahora este registro es de prueba: solo da clic en el botón.
-              </p>
+              {registerMessage && (
+                <p className="text-sm text-white/80">{registerMessage}</p>
+              )}
             </form>
           </div>
 
@@ -150,7 +283,9 @@ export default function PortalFamiliarPage() {
               <div>
                 <label className="text-sm text-white/80">Email</label>
                 <input
-                  type="text"
+                  type="email"
+                  value={emailLogin}
+                  onChange={(e) => setEmailLogin(e.target.value)}
                   placeholder="tutor@email.com"
                   className="mt-2 w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none focus:ring-white/25"
                 />
@@ -160,22 +295,27 @@ export default function PortalFamiliarPage() {
                 <label className="text-sm text-white/80">Contraseña</label>
                 <input
                   type="password"
+                  value={passwordLogin}
+                  onChange={(e) => setPasswordLogin(e.target.value)}
                   placeholder="••••••••"
                   className="mt-2 w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none focus:ring-white/25"
                 />
               </div>
 
-              <button type="submit" className="btn-pill btn-primary w-full">
-                Iniciar sesión
+              <button
+                type="submit"
+                disabled={loadingLogin}
+                className="btn-pill btn-primary w-full"
+              >
+                {loadingLogin ? "Ingresando..." : "Iniciar sesión"}
               </button>
 
-              <p className="text-xs text-white/55">
-                Por ahora este registro es de prueba: solo da clic en el botón.
-              </p>
+              {loginMessage && (
+                <p className="text-sm text-white/80">{loginMessage}</p>
+              )}
             </form>
           </div>
         </section>
-
       </div>
     </main>
   );

@@ -3,18 +3,18 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 
 export async function POST(req) {
   try {
-    const {
-      nombre_completo,
-      fecha_nacimiento,
-      codigo_jugador,
-      codigo_familiar,
-    } = await req.json();
+    const body = await req.json();
+
+    const nombreCompleto = body.nombreCompleto?.trim();
+    const fechaNacimiento = body.fechaNacimiento?.trim();
+    const codigoJugador = body.codigoJugador?.trim();
+    const codigoFamiliar = body.codigoFamiliar?.trim();
 
     if (
-      !nombre_completo ||
-      !fecha_nacimiento ||
-      !codigo_jugador ||
-      !codigo_familiar
+      !nombreCompleto ||
+      !fechaNacimiento ||
+      !codigoJugador ||
+      !codigoFamiliar
     ) {
       return NextResponse.json(
         { error: "Faltan datos" },
@@ -26,18 +26,16 @@ export async function POST(req) {
       .from("jugador")
       .insert([
         {
-          nombre_completo,
-          fecha_nacimiento,
-          codigo_jugador,
-          codigo_familiar,
+          nombre_completo: nombreCompleto,
+          fecha_nacimiento: fechaNacimiento,
+          codigo_jugador: codigoJugador,
+          codigo_familiar: codigoFamiliar,
         },
       ])
       .select()
       .single();
 
     if (error) {
-      console.error("Supabase error:", error);
-
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -49,8 +47,6 @@ export async function POST(req) {
       jugador: data,
     });
   } catch (error) {
-    console.error("Route error:", error);
-
     return NextResponse.json(
       { error: error.message || "Error interno del servidor" },
       { status: 500 }
