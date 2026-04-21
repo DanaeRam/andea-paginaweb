@@ -10,11 +10,11 @@ function fakeCode(prefix) {
   return `${prefix}-${part}`;
 }
 
-function calculateAge(fechaNacimiento) {
-  if (!fechaNacimiento) return "";
+function calculateAge(fecha_nacimiento) {
+  if (!fecha_nacimiento) return "";
 
   const today = new Date();
-  const birthDate = new Date(`${fechaNacimiento}T00:00:00`);
+  const birthDate = new Date(`${fecha_nacimiento}T00:00:00`);
 
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -118,8 +118,8 @@ export default function AdminGestionPage() {
       return;
     }
 
-    const fechaNacimiento = formatDateForDB(dia, mes, anio);
-    const edadCalculada = calculateAge(fechaNacimiento);
+    const fecha_nacimiento = formatDateForDB(dia, mes, anio);
+    const edadCalculada = calculateAge(fecha_nacimiento);
 
     if (edadCalculada < 0 || edadCalculada > 120) {
       setMessage("La fecha de nacimiento no es válida.");
@@ -138,10 +138,10 @@ export default function AdminGestionPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          nombreCompleto: nombreCompleto.trim(),
-          fechaNacimiento,
-          codigoJugador: nuevoGameCode,
-          codigoFamiliar: nuevoFamCode,
+          nombre_completo: nombreCompleto.trim(),
+          fecha_nacimiento,
+          codigo_jugador: nuevoGameCode,
+          codigo_familiar: nuevoFamCode,
         }),
       });
 
@@ -454,19 +454,19 @@ export default function AdminGestionPage() {
                       historial.map((jugador) => (
                         <tr key={jugador.id}>
                           <td className="px-4 py-3">
-                            {jugador.nombreCompleto}
+                            {jugador.nombre_completo}
                           </td>
                           <td className="px-4 py-3 text-white/75">
-                            {calculateAge(jugador.fechaNacimiento)}
+                            {calculateAge(jugador.fecha_nacimiento)}
                           </td>
                           <td className="px-4 py-3 font-mono text-white/75">
-                            {jugador.codigoJugador}
+                            {jugador.codigo_jugador}
                           </td>
                           <td className="px-4 py-3 font-mono text-white/75">
-                            {jugador.codigoFamiliar}
+                            {jugador.codigo_familiar}
                           </td>
                           <td className="px-4 py-3 text-white/75">
-                            {formatDisplayDate(jugador.createdAt)}
+                            {formatDisplayDate(jugador.created_at)}
                           </td>
                         </tr>
                       ))

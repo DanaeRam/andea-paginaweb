@@ -4,17 +4,17 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 export async function POST(req) {
   try {
     const {
-      nombreCompleto,
-      fechaNacimiento,
-      codigoJugador,
-      codigoFamiliar,
+      nombre_completo,
+      fecha_nacimiento,
+      codigo_jugador,
+      codigo_familiar,
     } = await req.json();
 
     if (
-      !nombreCompleto ||
-      !fechaNacimiento ||
-      !codigoJugador ||
-      !codigoFamiliar
+      !nombre_completo ||
+      !fecha_nacimiento ||
+      !codigo_jugador ||
+      !codigo_familiar
     ) {
       return NextResponse.json(
         { error: "Faltan datos" },
@@ -26,10 +26,10 @@ export async function POST(req) {
       .from("jugador")
       .insert([
         {
-          nombreCompleto,
-          fechaNacimiento,
-          codigoJugador,
-          codigoFamiliar,
+          nombre_completo,
+          fecha_nacimiento,
+          codigo_jugador,
+          codigo_familiar,
         },
       ])
       .select()
