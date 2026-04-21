@@ -3,9 +3,19 @@ import { supabaseAdmin } from "../../../../lib/supabase";
 
 export async function POST(req) {
   try {
-    const { nombre, edad, codigo } = await req.json();
+    const {
+      nombreCompleto,
+      fechaNacimiento,
+      codigoJugador,
+      codigoFamiliar,
+    } = await req.json();
 
-    if (!nombre || !edad || !codigo) {
+    if (
+      !nombreCompleto ||
+      !fechaNacimiento ||
+      !codigoJugador ||
+      !codigoFamiliar
+    ) {
       return NextResponse.json(
         { error: "Faltan datos" },
         { status: 400 }
@@ -14,12 +24,20 @@ export async function POST(req) {
 
     const { data, error } = await supabaseAdmin
       .from("jugador")
-      .insert([{ nombreCompleto, fechaNacimiento, codigoJugador, codigoFamiliar }])
+      .insert([
+        {
+          nombreCompleto,
+          fechaNacimiento,
+          codigoJugador,
+          codigoFamiliar,
+        },
+      ])
       .select()
       .single();
 
     if (error) {
       console.error("Supabase error:", error);
+
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -32,6 +50,7 @@ export async function POST(req) {
     });
   } catch (error) {
     console.error("Route error:", error);
+
     return NextResponse.json(
       { error: error.message || "Error interno del servidor" },
       { status: 500 }

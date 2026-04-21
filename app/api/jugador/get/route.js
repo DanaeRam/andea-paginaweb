@@ -1,6 +1,25 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabase";
 
+function calculateAge(fechaNacimiento) {
+  if (!fechaNacimiento) return null;
+
+  const today = new Date();
+  const birthDate = new Date(`${fechaNacimiento}T00:00:00`);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
@@ -11,8 +30,7 @@ export async function GET() {
         fechaNacimiento,
         codigoJugador,
         codigoFamiliar,
-        createdAt,
-        edad:EXTRACT(YEAR FROM AGE(current_date, fechaNacimiento))
+        createdAt
       `)
       .order("id", { ascending: false });
 
@@ -23,11 +41,15 @@ export async function GET() {
       );
     }
 
+    const jugadores = (data || []).map((jugador) => ({
+      ...jugador,
+      edad: calculateAge(jugador.fechaNacimiento),
+    }));
+
     return NextResponse.json({
       ok: true,
-      jugadores: data,
+      jugadores,
     });
-
   } catch (error) {
     return NextResponse.json(
       { error: "Error interno del servidor" },

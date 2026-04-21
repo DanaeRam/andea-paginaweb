@@ -14,7 +14,7 @@ function calculateAge(fechaNacimiento) {
   if (!fechaNacimiento) return "";
 
   const today = new Date();
-  const birthDate = new Date(fechaNacimiento);
+  const birthDate = new Date(`${fechaNacimiento}T00:00:00`);
 
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -29,13 +29,14 @@ function calculateAge(fechaNacimiento) {
   return age;
 }
 
-function formatDateForInput(day, month, year) {
+function formatDateForDB(day, month, year) {
   if (!day || !month || !year) return "";
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
 function formatDisplayDate(dateString) {
   if (!dateString) return "";
+
   const date = new Date(dateString);
 
   return date.toLocaleDateString("es-MX", {
@@ -45,11 +46,29 @@ function formatDisplayDate(dateString) {
   });
 }
 
+function isValidDateParts(day, month, year) {
+  const d = Number(day);
+  const m = Number(month);
+  const y = Number(year);
+
+  if (!day || !month || !year) return false;
+  if (year.length !== 4) return false;
+  if (m < 1 || m > 12) return false;
+  if (d < 1 || d > 31) return false;
+
+  const date = new Date(y, m - 1, d);
+
+  return (
+    date.getFullYear() === y &&
+    date.getMonth() === m - 1 &&
+    date.getDate() === d
+  );
+}
+
 export default function AdminGestionPage() {
   const [activeForm, setActiveForm] = useState(null);
 
   const [nombreCompleto, setNombreCompleto] = useState("");
-  const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [dia, setDia] = useState("");
   const [mes, setMes] = useState("");
   const [anio, setAnio] = useState("");
@@ -65,55 +84,42 @@ export default function AdminGestionPage() {
   const [loadingHistorial, setLoadingHistorial] = useState(false);
   const [historialError, setHistorialError] = useState("");
 
-  function handleCalendarChange(value) {
-    setFechaNacimiento(value);
-
-    if (!value) {
-      setDia("");
-      setMes("");
-      setAnio("");
-      return;
-    }
-
-    const [year, month, day] = value.split("-");
-    setDia(day || "");
-    setMes(month || "");
-    setAnio(year || "");
-  }
-
   function handleManualDateChange(type, value) {
     const onlyNumbers = value.replace(/\D/g, "");
 
-    if (type === "dia") setDia(onlyNumbers.slice(0, 2));
-    if (type === "mes") setMes(onlyNumbers.slice(0, 2));
-    if (type === "anio") setAnio(onlyNumbers.slice(0, 4));
+    if (type === "dia") {
+      setDia(onlyNumbers.slice(0, 2));
+    }
 
-    const newDay = type === "dia" ? onlyNumbers.slice(0, 2) : dia;
-    const newMonth = type === "mes" ? onlyNumbers.slice(0, 2) : mes;
-    const newYear = type === "anio" ? onlyNumbers.slice(0, 4) : anio;
+    if (type === "mes") {
+      setMes(onlyNumbers.slice(0, 2));
+    }
 
-    if (newDay.length >= 1 && newMonth.length >= 1 && newYear.length === 4) {
-      const formatted = formatDateForInput(newDay, newMonth, newYear);
-      const testDate = new Date(formatted);
-
-      if (!isNaN(testDate.getTime())) {
-        setFechaNacimiento(formatted);
-      }
+    if (type === "anio") {
+      setAnio(onlyNumbers.slice(0, 4));
     }
   }
 
   async function handleCreateStudent() {
     setMessage("");
 
-    const finalFechaNacimiento =
-      fechaNacimiento || formatDateForInput(dia, mes, anio);
-
-    if (!nombreCompleto.trim() || !finalFechaNacimiento) {
-      setMessage("Completa el nombre completo y la fecha de nacimiento.");
+    if (!nombreCompleto.trim()) {
+      setMessage("Completa el nombre completo.");
       return;
     }
 
-    const edadCalculada = calculateAge(finalFechaNacimiento);
+    if (!dia || !mes || !anio) {
+      setMessage("Completa la fecha de nacimiento.");
+      return;
+    }
+
+    if (!isValidDateParts(dia, mes, anio)) {
+      setMessage("La fecha de nacimiento no es válida.");
+      return;
+    }
+
+    const fechaNacimiento = formatDateForDB(dia, mes, anio);
+    const edadCalculada = calculateAge(fechaNacimiento);
 
     if (edadCalculada < 0 || edadCalculada > 120) {
       setMessage("La fecha de nacimiento no es válida.");
@@ -133,7 +139,7 @@ export default function AdminGestionPage() {
         },
         body: JSON.stringify({
           nombreCompleto: nombreCompleto.trim(),
-          fechaNacimiento: finalFechaNacimiento,
+          fechaNacimiento,
           codigoJugador: nuevoGameCode,
           codigoFamiliar: nuevoFamCode,
         }),
@@ -151,7 +157,6 @@ export default function AdminGestionPage() {
       setMessage("Jugador creado correctamente.");
 
       setNombreCompleto("");
-      setFechaNacimiento("");
       setDia("");
       setMes("");
       setAnio("");
@@ -253,6 +258,7 @@ export default function AdminGestionPage() {
                     inputMode="numeric"
                     className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
                   />
+
                   <input
                     value={mes}
                     onChange={(e) =>
@@ -262,6 +268,7 @@ export default function AdminGestionPage() {
                     inputMode="numeric"
                     className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
                   />
+
                   <input
                     value={anio}
                     onChange={(e) =>
@@ -272,13 +279,6 @@ export default function AdminGestionPage() {
                     className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
                   />
                 </div>
-
-                <input
-                  type="date"
-                  value={fechaNacimiento}
-                  onChange={(e) => handleCalendarChange(e.target.value)}
-                  className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
-                />
               </div>
 
               <button
