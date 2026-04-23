@@ -1,26 +1,20 @@
 @import "tailwindcss";
-
 :root {
   --bg-deep: #0b1235;
   --text-soft: rgba(255, 255, 255, 0.82);
   --text-muted: rgba(255, 255, 255, 0.68);
-
   --glass: rgba(255, 255, 255, 0.16);
   --stroke: rgba(255, 255, 255, 0.24);
-
   --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
   --shadow-strong: 0 16px 40px rgba(0, 0, 0, 0.32);
-
   --transition-fast: 180ms ease;
   --transition-medium: 280ms ease;
-
   --gradient-button: linear-gradient(
     135deg,
     #1a2c7a 0%,
     #3f4bd9 50%,
     #7b5cff 100%
   );
-
   --gradient-section: linear-gradient(
     135deg,
     #0f1b4c 0%,
@@ -29,16 +23,13 @@
     #a875ff 100%
   );
 }
-
 html,
 body {
   height: 100%;
 }
-
 html {
   scroll-behavior: smooth;
 }
-
 body {
   margin: 0;
   background: var(--bg-deep);
@@ -46,11 +37,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 .mainimage-overlay {
   background:
-    radial-gradient(80% 70% at 70% 10%, rgba(255, 255, 255, 0.06), transparent 60%),
-    radial-gradient(70% 70% at 20% 20%, rgba(167, 139, 250, 0.12), transparent 60%),
+    radial-gradient(
+      80% 70% at 70% 10%,
+      rgba(255, 255, 255, 0.06),
+      transparent 60%
+    ),
+    radial-gradient(
+      70% 70% at 20% 20%,
+      rgba(167, 139, 250, 0.12),
+      transparent 60%
+    ),
     linear-gradient(
       90deg,
       rgba(0, 0, 0, 0.78) 0%,
@@ -58,24 +56,20 @@ body {
       rgba(0, 0, 0, 0.16) 100%
     );
 }
-
 .text-mainimage-title {
   text-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
 }
-
 .text-mainimage-paragraph {
   color: var(--text-soft);
   text-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
   line-height: 1.6;
 }
-
 .mainimage-divider {
   width: 180px;
   height: 1px;
   background: rgba(255, 255, 255, 0.55);
   border: 0;
 }
-
 .glass {
   background: var(--glass);
   border: 1px solid var(--stroke);
@@ -83,7 +77,6 @@ body {
   -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-soft);
 }
-
 .btn-pill {
   display: inline-flex;
   align-items: center;
@@ -101,22 +94,18 @@ body {
     box-shadow var(--transition-medium),
     background var(--transition-medium);
 }
-
 .btn-pill:hover {
   transform: translateY(-1px);
 }
-
 .btn-primary {
   background: var(--gradient-button);
   color: white;
   box-shadow: 0 10px 25px rgba(30, 40, 120, 0.35);
 }
-
 .btn-primary:hover {
   opacity: 0.96;
   box-shadow: 0 14px 30px rgba(30, 40, 120, 0.42);
 }
-
 .btn-glass {
   background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -124,15 +113,12 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
-
 .btn-glass:hover {
   background: rgba(255, 255, 255, 0.24);
 }
-
 .section-purple {
   background: var(--gradient-section);
 }
-
 .card-glass {
   border-radius: 18px;
   background: linear-gradient(
@@ -149,17 +135,14 @@ body {
     box-shadow var(--transition-medium),
     border-color var(--transition-medium);
 }
-
 .card-glass:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-strong);
   border-color: rgba(255, 255, 255, 0.35);
 }
-
 .text-soft {
   color: var(--text-soft);
 }
-
 .text-muted {
   color: var(--text-muted);
 }

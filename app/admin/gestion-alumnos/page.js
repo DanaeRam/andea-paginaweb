@@ -29,9 +29,10 @@ function calculateAge(fecha_nacimiento) {
   return age;
 }
 
-function formatDateForDB(day, month, year) {
-  if (!day || !month || !year) return "";
-  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+function formatDateForDB(fecha) {
+  if (!fecha) return "";
+  const date = new Date(fecha);
+  return date.toISOString().split("T")[0];  // Formato YYYY-MM-DD
 }
 
 function formatDisplayDate(dateString) {
@@ -46,32 +47,11 @@ function formatDisplayDate(dateString) {
   });
 }
 
-function isValidDateParts(day, month, year) {
-  const d = Number(day);
-  const m = Number(month);
-  const y = Number(year);
-
-  if (!day || !month || !year) return false;
-  if (year.length !== 4) return false;
-  if (m < 1 || m > 12) return false;
-  if (d < 1 || d > 31) return false;
-
-  const date = new Date(y, m - 1, d);
-
-  return (
-    date.getFullYear() === y &&
-    date.getMonth() === m - 1 &&
-    date.getDate() === d
-  );
-}
-
 export default function AdminGestionPage() {
   const [activeForm, setActiveForm] = useState(null);
 
   const [nombreCompleto, setNombreCompleto] = useState("");
-  const [dia, setDia] = useState("");
-  const [mes, setMes] = useState("");
-  const [anio, setAnio] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState("");
 
   const [gameCode, setGameCode] = useState("");
   const [famCode, setFamCode] = useState("");
@@ -84,22 +64,6 @@ export default function AdminGestionPage() {
   const [loadingHistorial, setLoadingHistorial] = useState(false);
   const [historialError, setHistorialError] = useState("");
 
-  function handleManualDateChange(type, value) {
-    const onlyNumbers = value.replace(/\D/g, "");
-
-    if (type === "dia") {
-      setDia(onlyNumbers.slice(0, 2));
-    }
-
-    if (type === "mes") {
-      setMes(onlyNumbers.slice(0, 2));
-    }
-
-    if (type === "anio") {
-      setAnio(onlyNumbers.slice(0, 4));
-    }
-  }
-
   async function handleCreateStudent() {
     setMessage("");
 
@@ -108,20 +72,14 @@ export default function AdminGestionPage() {
       return;
     }
 
-    if (!dia || !mes || !anio) {
+    if (!fechaNacimiento) {
       setMessage("Completa la fecha de nacimiento.");
       return;
     }
 
-    if (!isValidDateParts(dia, mes, anio)) {
-      setMessage("La fecha de nacimiento no es válida.");
-      return;
-    }
+    const edadCalculada = calculateAge(fechaNacimiento);
 
-    const fecha_nacimiento = formatDateForDB(dia, mes, anio);
-    const edadCalculada = calculateAge(fecha_nacimiento);
-
-    if (edadCalculada < 0 || edadCalculada > 120) {
+    if (edadCalculada < 0 || edadCalculada > 110) {
       setMessage("La fecha de nacimiento no es válida.");
       return;
     }
@@ -139,7 +97,7 @@ export default function AdminGestionPage() {
         },
         body: JSON.stringify({
           nombre_completo: nombreCompleto.trim(),
-          fecha_nacimiento,
+          fecha_nacimiento: formatDateForDB(fechaNacimiento),
           codigo_jugador: nuevoGameCode,
           codigo_familiar: nuevoFamCode,
         }),
@@ -157,9 +115,7 @@ export default function AdminGestionPage() {
       setMessage("Jugador creado correctamente.");
 
       setNombreCompleto("");
-      setDia("");
-      setMes("");
-      setAnio("");
+      setFechaNacimiento("");
 
       if (activeForm === "historial") {
         fetchHistorial();
@@ -250,32 +206,9 @@ export default function AdminGestionPage() {
 
                 <div className="grid grid-cols-3 gap-3">
                   <input
-                    value={dia}
-                    onChange={(e) =>
-                      handleManualDateChange("dia", e.target.value)
-                    }
-                    placeholder="Día"
-                    inputMode="numeric"
-                    className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
-                  />
-
-                  <input
-                    value={mes}
-                    onChange={(e) =>
-                      handleManualDateChange("mes", e.target.value)
-                    }
-                    placeholder="Mes"
-                    inputMode="numeric"
-                    className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
-                  />
-
-                  <input
-                    value={anio}
-                    onChange={(e) =>
-                      handleManualDateChange("anio", e.target.value)
-                    }
-                    placeholder="Año"
-                    inputMode="numeric"
+                    type="date"
+                    value={fechaNacimiento}
+                    onChange={(e) => setFechaNacimiento(e.target.value)}
                     className="w-full rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 outline-none"
                   />
                 </div>
@@ -358,7 +291,7 @@ export default function AdminGestionPage() {
           )}
         </div>
 
-        <div className="card-glass p-5">
+                <div className="card-glass p-5">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold">Dar de baja</h2>
@@ -388,9 +321,11 @@ export default function AdminGestionPage() {
             </div>
           )}
         </div>
+
+        {/* Otros componentes como "Dar de baja" y "Historial" */}
       </div>
 
-      <div className="card-glass p-5">
+            <div className="card-glass p-5">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold">Historial</h2>
@@ -478,6 +413,7 @@ export default function AdminGestionPage() {
           </div>
         )}
       </div>
+      
     </div>
   );
 }
