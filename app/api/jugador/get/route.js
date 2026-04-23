@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabase";
 
-function calculateAge(fechaNacimiento) {
-  if (!fechaNacimiento) return null;
+function calculateAge(fecha_nacimiento) {
+  if (!fecha_nacimiento) return null;
 
   const today = new Date();
-  const birthDate = new Date(`${fechaNacimiento}T00:00:00`);
+  const birthDate = new Date(`${fecha_nacimiento}T00:00:00`);
 
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -42,12 +42,7 @@ export async function GET() {
     }
 
     const jugadores = (data || []).map((jugador) => ({
-      id: jugador.id,
-      nombreCompleto: jugador.nombre_completo,
-      fechaNacimiento: jugador.fecha_nacimiento,
-      codigoJugador: jugador.codigo_jugador,
-      codigoFamiliar: jugador.codigo_familiar,
-      createdAt: jugador.created_at,
+      ...jugador,
       edad: calculateAge(jugador.fecha_nacimiento),
     }));
 

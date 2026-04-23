@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabase";
 
-function calculateAge(fechaNacimiento) {
-  if (!fechaNacimiento) return null;
+function calculateAge(fecha_nacimiento) {
+  if (!fecha_nacimiento) return null;
 
   const today = new Date();
-  const birthDate = new Date(`${fechaNacimiento}T00:00:00`);
+  const birthDate = new Date(`${fecha_nacimiento}T00:00:00`);
 
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -45,18 +45,15 @@ export async function POST(req) {
       .single();
 
     if (error || !data) {
-      return NextResponse.json({ valid: false });
+      return NextResponse.json({
+        valid: false,
+      });
     }
 
     return NextResponse.json({
       valid: true,
       jugador: {
-        id: data.id,
-        nombreCompleto: data.nombre_completo,
-        fechaNacimiento: data.fecha_nacimiento,
-        codigoJugador: data.codigo_jugador,
-        codigoFamiliar: data.codigo_familiar,
-        createdAt: data.created_at,
+        ...data,
         edad: calculateAge(data.fecha_nacimiento),
       },
     });
