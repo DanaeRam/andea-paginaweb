@@ -1,78 +1,89 @@
-import { NextResponse } from "next/server";
-import { supabaseAdmin } from "../../../../lib/supabase"; 
+import { supabaseAdmin } from "@/lib/supabase";
 
-export async function POST(req) {
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders(),
+  });
+}
+
+export async function POST(request) {
   try {
-    const { jugadorId, puntosGanados, runasGeneradas, motivo } = await req.json();
+    const body = await request.json();
+    const { codigo, puntos_ganados, motivo } = body ?? {};
 
-    if (!jugadorId || !puntosGanados || !runasGeneradas || !motivo) {
-      return NextResponse.json(
-        { error: "Faltan parámetros necesarios" },
-        { status: 400 }
+    if (!codigo || typeof codigo !== "string") {
+      return Response.json(
+        { ok: false, error: "Código inválido" },
+        { status: 400, headers: corsHeaders() }
       );
     }
 
-    const { data: progreso, error: errorProgreso } = await supabaseAdmin
-      .from("progreso_jugador")
-      .select("jugador_id, puntos_totales, runas, puntos_residuales")
-      .eq("jugador_id", jugadorId)
-      .single();
-
-    if (errorProgreso || !progreso) {
-      return NextResponse.json(
-        { error: "Jugador no encontrado" },
-        { status: 404 }
+    if (
+      puntos_ganados === undefined ||
+      typeof puntos_ganados !== "number" ||
+      puntos_ganados <= 0
+    ) {
+      return Response.json(
+        { ok: false, error: "puntos_ganados inválido" },
+        { status: 400, headers: corsHeaders() }
       );
     }
 
-    const puntosTotales = progreso.puntos_totales + puntosGanados;
-    const puntosResiduales = progreso.puntos_residuales - puntosGanados;
-    const runasTotales = progreso.runas + runasGeneradas;
-
-    const { error: errorActualizar } = await supabaseAdmin
-      .from("progreso_jugador")
-      .update({
-        puntos_totales: puntosTotales,
-        runas: runasTotales,
-        puntos_residuales: puntosResiduales
-      })
-      .eq("jugador_id", jugadorId);
-
-    if (errorActualizar) {
-      return NextResponse.json(
-        { error: "Error al actualizar el progreso del jugador" },
-        { status: 500 }
-      );
-    }
-
-    const { error: errorHistorial } = await supabaseAdmin
-      .from("historial_puntos")
-      .insert([
-        {
-          jugador_id: jugadorId,
-          puntos_ganados: puntosGanados,
-          runas_generadas: runasGeneradas,
-          puntos_residuales_antes: progreso.puntos_residuales,
-          puntos_residuales_despues: puntosResiduales,
-          motivo: motivo
-        }
-      ]);
-
-    if (errorHistorial) {
-      return NextResponse.json(
-        { error: "Error al registrar el cambio en el historial" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      valid: true,
-      mensaje: "Puntos agregados y registrados correctamente",
+    const { data, error } = await supabaseAdmin.rpc("agregar_puntos_por_codigo", {
+      p_codigo_jugador: codigo,
+      p_puntos_ganados: puntos_ganados,
+      p_motivo: motivo ?? null,
     });
-  } catch (err) {
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
+
+    if (error) {
+      return Response.json(
+        { ok: false, error: error.message },
+        { status: 500, headers: corsHeaders() }
+      );
+    }
+
+    if (!data || data.length === 0) {
+      return Response.json(
+        { ok: false, error: "No se pudo actualizar el progreso" },
+        { status: 404, headers: corsHeaders() }
+      );
+    }
+
+    const progreso = data[0];
+
+    return Response.json(
+      {
+        ok: true,
+        jugador_id: progreso.jugador_id,
+        puntos_totales: progreso.puntos_totales,
+        runas: progreso.runas,
+        puntos_residuales: progreso.puntos_residuales,
+        runas_generadas: progreso.runas_generadas,
+      },
+      {
+        status: 200,
+        headers: corsHeaders(),
+      }
+    );
+  } catch (error) {
+    return Response.json(
+      {
+        ok: false,
+        error: error.message || "Error interno del servidor",
+      },
+      {
+        status: 500,
+        headers: corsHeaders(),
+      }
     );
   }
 }
