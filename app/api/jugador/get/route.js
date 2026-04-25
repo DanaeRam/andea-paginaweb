@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "../../../../lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 
 function calculateAge(fecha_nacimiento) {
   if (!fecha_nacimiento) return null;
