@@ -8,8 +8,7 @@ const supabase = createClient(
 
 export async function POST(req) {
   try {
-    const { codigo } = await req.json();
-
+    const { codigo, mundo } = await req.json();
     if (!codigo) {
       return NextResponse.json(
         { ok: false, error: 'Falta código del jugador' },
@@ -18,7 +17,8 @@ export async function POST(req) {
     }
 
     const { data, error } = await supabase.rpc('obtener_estado_lecciones', {
-      p_codigo_jugador: codigo
+      p_codigo_jugador: codigo,
+      p_mundo: mundo || 'LE'
     });
 
     if (error) {
