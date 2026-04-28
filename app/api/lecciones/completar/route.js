@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export async function POST(req) {
   try {
-    const { codigo, leccionId } = await req.json();
+    const { codigo, leccionId, mundo = 'LE' } = await req.json();
 
     if (!codigo || !leccionId) {
       return NextResponse.json(
@@ -17,9 +17,12 @@ export async function POST(req) {
       );
     }
 
+    const mundoNormalizado = mundo.trim().toUpperCase();
+
     const { data, error } = await supabase.rpc('marcar_leccion_completada', {
       p_codigo_jugador: codigo,
-      p_leccion_id: leccionId
+      p_leccion_id: leccionId,
+      p_mundo: mundoNormalizado
     });
 
     if (error) {
