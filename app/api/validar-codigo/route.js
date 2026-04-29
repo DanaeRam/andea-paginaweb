@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 function calculateAge(fecha_nacimiento) {
   if (!fecha_nacimiento) return null;
 
@@ -27,7 +40,7 @@ export async function POST(req) {
     if (!codigo) {
       return NextResponse.json(
         { error: "Falta código" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -45,22 +58,26 @@ export async function POST(req) {
       .single();
 
     if (error || !data) {
-      return NextResponse.json({
-        valid: false,
-      });
+      return NextResponse.json(
+        { valid: false },
+        { headers: corsHeaders }
+      );
     }
 
-    return NextResponse.json({
-      valid: true,
-      jugador: {
-        ...data,
-        edad: calculateAge(data.fecha_nacimiento),
+    return NextResponse.json(
+      {
+        valid: true,
+        jugador: {
+          ...data,
+          edad: calculateAge(data.fecha_nacimiento),
+        },
       },
-    });
+      { headers: corsHeaders }
+    );
   } catch (err) {
     return NextResponse.json(
       { error: "Error interno" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
