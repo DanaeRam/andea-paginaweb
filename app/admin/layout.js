@@ -40,29 +40,18 @@ export default function AdminLayout({ children }) {
                 Gestión de padres
               </Link>
 
-              <Link
-                className="block rounded-xl px-3 py-2 bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
-                href="/admin/gestion-admins"
-              >
-                Gestión de administradores
-              </Link>
             </div>
 
             <div className="mt-6 h-px w-full bg-white/10" />
 
             <div className="mt-4 space-y-2 text-sm text-white/75">
               <Link className="block hover:text-white" href="/">
-                ← Ir a Inicio
+                ← Salir
               </Link>
 
-              <Link className="block hover:text-white" href="/admin">
-                Cerrar sesión (demo)
-              </Link>
             </div>
 
-            <p className="mt-6 text-xs text-white/55">
-              Datos de ejemplo (demo).
-            </p>
+
           </aside>
 
           <section className="flex-1">
