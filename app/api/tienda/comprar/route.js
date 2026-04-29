@@ -6,6 +6,19 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -14,7 +27,7 @@ export async function POST(req) {
     if (!codigo || !idRecompensa) {
       return NextResponse.json(
         { ok: false, error: 'Datos incompletos' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -26,23 +39,23 @@ export async function POST(req) {
     if (error) {
       return NextResponse.json(
         { ok: false, error: error.message },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
     if (!data || data.length === 0) {
       return NextResponse.json(
         { ok: false, error: 'No se recibió respuesta de la compra' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
-    return NextResponse.json(data[0], { status: 200 });
+    return NextResponse.json(data[0], { status: 200, headers: corsHeaders });
 
   } catch (error) {
     return NextResponse.json(
       { ok: false, error: error.message },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -50,6 +63,6 @@ export async function POST(req) {
 export async function GET() {
   return NextResponse.json(
     { ok: false, error: 'Método no permitido' },
-    { status: 405 }
+    { status: 405, headers: corsHeaders }
   );
 }
