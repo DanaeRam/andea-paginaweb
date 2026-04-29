@@ -1,17 +1,15 @@
 import { supabaseAdmin } from "@/lib/supabase";
 
-function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  };
-}
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
 export async function OPTIONS() {
   return new Response(null, {
-    status: 200,
-    headers: corsHeaders(),
+    status: 204,
+    headers: corsHeaders,
   });
 }
 
@@ -23,7 +21,7 @@ export async function POST(request) {
     if (!codigo || typeof codigo !== "string") {
       return Response.json(
         { ok: false, error: "Código inválido" },
-        { status: 400, headers: corsHeaders() }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -34,7 +32,7 @@ export async function POST(request) {
     ) {
       return Response.json(
         { ok: false, error: "puntos_ganados inválido" },
-        { status: 400, headers: corsHeaders() }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -47,14 +45,14 @@ export async function POST(request) {
     if (error) {
       return Response.json(
         { ok: false, error: error.message },
-        { status: 500, headers: corsHeaders() }
+        { status: 500, headers: corsHeaders }
       );
     }
 
     if (!data || data.length === 0) {
       return Response.json(
         { ok: false, error: "No se pudo actualizar el progreso" },
-        { status: 404, headers: corsHeaders() }
+        { status: 404, headers: corsHeaders }
       );
     }
 
@@ -71,7 +69,7 @@ export async function POST(request) {
       },
       {
         status: 200,
-        headers: corsHeaders(),
+        headers: corsHeaders,
       }
     );
   } catch (error) {
@@ -82,7 +80,7 @@ export async function POST(request) {
       },
       {
         status: 500,
-        headers: corsHeaders(),
+        headers: corsHeaders,
       }
     );
   }

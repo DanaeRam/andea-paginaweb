@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
@@ -23,7 +36,7 @@ export async function GET() {
     if (error) {
       return NextResponse.json(
         { error: error.message },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       );
     }
 
@@ -38,11 +51,11 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       padres,
-    });
+    }, { headers: corsHeaders });
   } catch (error) {
     return NextResponse.json(
       { error: "Error interno del servidor" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

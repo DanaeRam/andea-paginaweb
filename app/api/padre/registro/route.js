@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -13,7 +26,7 @@ export async function POST(req) {
     if (!nombreCompleto || !email || !password || !codigoFamiliar) {
       return NextResponse.json(
         { error: "Faltan datos" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -26,7 +39,7 @@ export async function POST(req) {
     if (jugadorError || !jugador) {
       return NextResponse.json(
         { error: "Código familiar inválido" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -40,7 +53,7 @@ export async function POST(req) {
     if (authError || !authData.user) {
       return NextResponse.json(
         { error: authError?.message || "No se pudo crear el usuario" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -61,7 +74,7 @@ export async function POST(req) {
 
       return NextResponse.json(
         { error: padreError.message },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       );
     }
 
@@ -80,18 +93,18 @@ export async function POST(req) {
 
       return NextResponse.json(
         { error: relacionError.message },
-        { status: 500 }
+        { status: 500, headers: corsHeaders }
       );
     }
 
     return NextResponse.json({
       ok: true,
       message: "Cuenta creada y vinculada correctamente",
-    });
+    }, { headers: corsHeaders });
   } catch (error) {
     return NextResponse.json(
       { error: error.message || "Error interno del servidor" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
