@@ -32,7 +32,7 @@ function calculateAge(fecha_nacimiento) {
 function formatDateForDB(fecha) {
   if (!fecha) return "";
   const date = new Date(fecha);
-  return date.toISOString().split("T")[0];  // Formato YYYY-MM-DD
+  return date.toISOString().split("T")[0]; 
 }
 
 function formatDisplayDate(dateString) {
@@ -322,7 +322,6 @@ export default function AdminGestionPage() {
           )}
         </div>
 
-        {/* Otros componentes como "Dar de baja" y "Historial" */}
       </div>
 
             <div className="card-glass p-5">

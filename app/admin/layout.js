@@ -6,10 +6,8 @@ export default function AdminLayout({ children }) {
       <div className="mx-auto max-w-7xl px-6 py-8">
         <div className="flex items-start gap-6">
 
-          {/* Sidebar */}
           <aside className="hidden md:block w-72 card-glass p-5 sticky top-6 h-[calc(100vh-3rem)] overflow-auto">
             
-            {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="glass h-10 w-10 rounded-full grid place-items-center">
                 <span className="text-sm font-semibold">A</span>
@@ -20,7 +18,6 @@ export default function AdminLayout({ children }) {
               </div>
             </div>
 
-            {/* Menú */}
             <div className="mt-6 space-y-2">
               <Link
                 className="block rounded-xl px-3 py-2 bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
@@ -53,7 +50,6 @@ export default function AdminLayout({ children }) {
 
             <div className="mt-6 h-px w-full bg-white/10" />
 
-            {/* Links secundarios */}
             <div className="mt-4 space-y-2 text-sm text-white/75">
               <Link className="block hover:text-white" href="/">
                 ← Ir a Inicio
@@ -69,10 +65,8 @@ export default function AdminLayout({ children }) {
             </p>
           </aside>
 
-          {/* Contenido */}
           <section className="flex-1">
 
-            {/* Top bar móvil */}
             <div className="md:hidden card-glass p-4 mb-4 flex items-center justify-between">
               <Link href="/admin/dashboard" className="font-semibold">
                 Admin

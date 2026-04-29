@@ -26,7 +26,6 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
 
-      {/* Header */}
       <div className="card-glass p-6">
         <p className="text-xs uppercase tracking-widest text-white/70">
           Dashboard general
