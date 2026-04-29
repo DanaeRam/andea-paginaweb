@@ -1,31 +1,126 @@
-const kpis = [
-  { label: "Niños activos", value: "48" },
-  { label: "Tiempo promedio", value: "22 min/día" },
-  { label: "% lecciones completadas", value: "63%" },
-  { label: "Sección más jugada", value: "Lecto-escritura" },
-];
+import { supabaseAdmin } from "@/lib/supabase";
 
-const weekly = [
-  { day: "Lun", val: 34 },
-  { day: "Mar", val: 42 },
-  { day: "Mié", val: 28 },
-  { day: "Jue", val: 50 },
-  { day: "Vie", val: 39 },
-  { day: "Sáb", val: 57 },
-  { day: "Dom", val: 44 },
-];
+export const dynamic = "force-dynamic";
 
-const lowActivity = [
-  { name: "Ana L.", lastSeen: "Hace 12 días", total: "45 min" },
-  { name: "Diego R.", lastSeen: "Hace 9 días", total: "30 min" },
-  { name: "Sofía M.", lastSeen: "Hace 15 días", total: "25 min" },
-  { name: "Luis P.", lastSeen: "Hace 11 días", total: "40 min" },
-];
+function formatDate(dateString) {
+  if (!dateString) return "Sin actividad";
 
-export default function AdminDashboardPage() {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("es-MX", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export default async function AdminDashboardPage() {
+  const { data: jugadores = [] } = await supabaseAdmin
+    .from("jugador")
+    .select("id, nombre_completo, created_at");
+
+  const { data: lecciones = [] } = await supabaseAdmin
+    .from("lecciones")
+    .select("id, nombre, nivel, mundo, activa");
+
+  const { data: progreso = [] } = await supabaseAdmin
+    .from("progreso_lecciones")
+    .select("jugador_id, leccion_id, completada, completada_at, created_at")
+    .eq("completada", true);
+
+  const totalJugadores = jugadores.length;
+  const totalLecciones = lecciones.filter((l) => l.activa).length;
+
+  const progresoUnico = new Map();
+
+  progreso.forEach((p) => {
+    const key = `${p.jugador_id}-${p.leccion_id}`;
+    progresoUnico.set(key, p);
+  });
+
+  const leccionesCompletadas = progresoUnico.size;
+
+  const totalPosibles = totalJugadores * totalLecciones;
+
+  const porcentajeCompletado =
+    totalPosibles > 0
+      ? Math.round((leccionesCompletadas / totalPosibles) * 100)
+      : 0;
+
+  const promedioLecciones =
+    totalJugadores > 0
+      ? (leccionesCompletadas / totalJugadores).toFixed(1)
+      : 0;
+
+  const leccionesMap = new Map(lecciones.map((l) => [l.id, l]));
+
+  const mundoCount = {};
+
+  progresoUnico.forEach((p) => {
+    const leccion = leccionesMap.get(p.leccion_id);
+    const mundo = leccion?.mundo || "Sin mundo";
+
+    mundoCount[mundo] = (mundoCount[mundo] || 0) + 1;
+  });
+
+  const mundoMasJugado =
+    Object.entries(mundoCount).sort((a, b) => b[1] - a[1])[0]?.[0] ||
+    "Sin datos";
+
+  const progresoPorJugador = jugadores.map((j) => {
+    const completadas = [...progresoUnico.values()].filter(
+      (p) => p.jugador_id === j.id
+    );
+
+    const ultimaActividad = completadas
+      .map((p) => p.completada_at || p.created_at)
+      .filter(Boolean)
+      .sort((a, b) => new Date(b) - new Date(a))[0];
+
+    return {
+      id: j.id,
+      nombre: j.nombre_completo,
+      completadas: completadas.length,
+      porcentaje:
+        totalLecciones > 0
+          ? Math.round((completadas.length / totalLecciones) * 100)
+          : 0,
+      ultimaActividad,
+    };
+  });
+
+  const bajaActividad = progresoPorJugador
+    .sort((a, b) => a.completadas - b.completadas)
+    .slice(0, 5);
+
+  const niveles = ["Basico", "Intermedio", "Avanzado"];
+
+  const progresoPorNivel = niveles.map((nivel) => {
+    const leccionesNivel = lecciones.filter((l) => l.nivel === nivel);
+
+    const completadasNivel = [...progresoUnico.values()].filter((p) => {
+      const leccion = leccionesMap.get(p.leccion_id);
+      return leccion?.nivel === nivel;
+    }).length;
+
+    const totalNivel = leccionesNivel.length * totalJugadores;
+
+    return {
+      nivel,
+      porcentaje:
+        totalNivel > 0 ? Math.round((completadasNivel / totalNivel) * 100) : 0,
+    };
+  });
+
+  const kpis = [
+    { label: "Niños registrados", value: totalJugadores },
+    { label: "Lecciones activas", value: totalLecciones },
+    { label: "% lecciones completadas", value: `${porcentajeCompletado}%` },
+    { label: "Promedio por niño", value: `${promedioLecciones} lecciones` },
+    { label: "Sección más jugada", value: mundoMasJugado },
+  ];
+
   return (
     <div className="space-y-6">
-
       <div className="card-glass p-6">
         <p className="text-xs uppercase tracking-widest text-white/70">
           Dashboard general
@@ -36,51 +131,48 @@ export default function AdminDashboardPage() {
         </h1>
 
         <p className="mt-3 text-white/75">
-          Indicadores para monitorear uso, avance y alertas de seguimiento (demo).
+          Indicadores calculados con datos reales de jugadores, lecciones y
+          progreso de lecciones.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
         {kpis.map((k) => (
           <div key={k.label} className="card-glass p-6">
             <p className="text-xs uppercase tracking-widest text-white/70">
               {k.label}
             </p>
 
-            <div className="mt-3 text-3xl font-semibold">
-              {k.value}
-            </div>
-
-            <div className="mt-2 text-sm text-white/60">
-              Datos de ejemplo.
-            </div>
+            <div className="mt-3 text-3xl font-semibold">{k.value}</div>
           </div>
         ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-
         <div className="card-glass p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Actividad semanal</h2>
-            <span className="text-xs text-white/60">Sesiones por día</span>
+            <h2 className="text-xl font-semibold">Avance por nivel</h2>
+            <span className="text-xs text-white/60">Promedio general</span>
           </div>
 
-          <div className="mt-6 flex items-end justify-between gap-3 h-44">
-            {weekly.map((p) => (
-              <div key={p.day} className="flex flex-col items-center gap-2 w-full">
-                <div className="relative w-full flex items-end justify-center">
+          <div className="mt-6 space-y-5">
+            {progresoPorNivel.map((item) => (
+              <div key={item.nivel}>
+                <div className="mb-2 flex justify-between text-sm">
+                  <span>{item.nivel}</span>
+                  <span className="text-white/70">{item.porcentaje}%</span>
+                </div>
+
+                <div className="h-3 overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="w-3 rounded-full"
+                    className="h-full rounded-full"
                     style={{
-                      height: `${p.val * 2}px`,
+                      width: `${item.porcentaje}%`,
                       background:
-                        "linear-gradient(180deg, rgba(155,108,255,.95), rgba(110,199,255,.95))",
-                      boxShadow: "0 12px 35px rgba(0,0,0,.25)",
+                        "linear-gradient(90deg, rgba(155,108,255,.95), rgba(110,199,255,.95))",
                     }}
                   />
                 </div>
-                <div className="text-xs text-white/70">{p.day}</div>
               </div>
             ))}
           </div>
@@ -88,10 +180,8 @@ export default function AdminDashboardPage() {
 
         <div className="card-glass p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">
-              Niños con baja actividad
-            </h2>
-            <span className="text-xs text-white/60">Alerta</span>
+            <h2 className="text-xl font-semibold">Niños con menor avance</h2>
+            <span className="text-xs text-white/60">Seguimiento</span>
           </div>
 
           <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-white/10">
@@ -99,23 +189,34 @@ export default function AdminDashboardPage() {
               <thead className="bg-white/5">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold">Nombre</th>
-                  <th className="px-4 py-3 text-left font-semibold">Última vez</th>
-                  <th className="px-4 py-3 text-left font-semibold">Tiempo total</th>
+                  <th className="px-4 py-3 text-left font-semibold">
+                    Lecciones
+                  </th>
+                  <th className="px-4 py-3 text-left font-semibold">Avance</th>
+                  <th className="px-4 py-3 text-left font-semibold">
+                    Última actividad
+                  </th>
                 </tr>
               </thead>
 
               <tbody className="divide-y divide-white/10">
-                {lowActivity.map((r) => (
-                  <tr key={r.name}>
-                    <td className="px-4 py-3">{r.name}</td>
-                    <td className="px-4 py-3 text-white/75">{r.lastSeen}</td>
-                    <td className="px-4 py-3 text-white/75">{r.total}</td>
+                {bajaActividad.map((r) => (
+                  <tr key={r.id}>
+                    <td className="px-4 py-3">{r.nombre}</td>
+                    <td className="px-4 py-3 text-white/75">
+                      {r.completadas}
+                    </td>
+                    <td className="px-4 py-3 text-white/75">
+                      {r.porcentaje}%
+                    </td>
+                    <td className="px-4 py-3 text-white/75">
+                      {formatDate(r.ultimaActividad)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
         </div>
       </div>
     </div>
