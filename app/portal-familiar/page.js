@@ -84,6 +84,7 @@ export default function PortalFamiliarPage() {
       setCodigoFamiliar("");
 
       router.push("/portal-familiar/registro-exitoso");
+      
     } catch (error) {
       setRegisterMessage("Error de conexión con el servidor.");
     } finally {
@@ -122,6 +123,7 @@ export default function PortalFamiliarPage() {
       }
 
       router.push("/portal-familiar/acceso-padres");
+router.refresh();
     } catch (error) {
       setLoginMessage("Error al iniciar sesión.");
     } finally {
