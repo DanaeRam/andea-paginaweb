@@ -197,7 +197,7 @@ router.refresh();
             <div>
               <h3 className="text-lg font-semibold">Objetivo del juego</h3>
               <p className="mt-2 leading-relaxed text-white/75">
-                Descripción ...
+                Ayudar a los niños a aprender mientras juegan, desarrollando habilidades de lectura, matemáticas y comprensión emocional mientras se divierten en un entorno seguro.
               </p>
             </div>
           </div>
