@@ -89,7 +89,7 @@ export default function HomePage() {
 
             <div className="mt-7 flex items-center gap-4">
               <a
-                href="https://danaeram.github.io/AndeaWeb3/"
+                href="https://a01754754.github.io/ANDEA-FINAL-WEB/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-pill btn-primary"
